@@ -1,3 +1,4 @@
+import Categories from "@/components/categories";
 import { theme } from "@/constants/theme";
 import { hp, wp } from "@/helpers/common";
 import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
@@ -16,6 +17,8 @@ const HomeScreen = () => {
   const { top } = useSafeAreaInsets();
 
   const [search, setSearch] = useState<string>("");
+
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   const searchInputRef = useRef(null);
 
@@ -61,6 +64,13 @@ const HomeScreen = () => {
               />
             </Pressable>
           )}
+        </View>
+
+        <View style={styles.categories}>
+          <Categories
+            activeCategory={activeCategory}
+            handleChangeActive={setActiveCategory}
+          />
         </View>
       </ScrollView>
     </View>
@@ -109,6 +119,7 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: theme.radius.sm,
   },
+  categories: {},
 });
 
 export default HomeScreen;
