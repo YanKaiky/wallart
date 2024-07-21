@@ -1,8 +1,10 @@
-import Categories from "@/components/categories";
+import Categories from "@/components/Categories";
+import ImagesGrid from "@/components/ImagesGrid";
 import { theme } from "@/constants/theme";
 import { hp, wp } from "@/helpers/common";
+import ImagesService, { IhandleImagesResponse } from "@/services/images/images";
 import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Pressable,
   ScrollView,
@@ -17,12 +19,31 @@ const HomeScreen = () => {
   const { top } = useSafeAreaInsets();
 
   const [search, setSearch] = useState<string>("");
+  const [images, setImages] = useState<object[]>([]);
 
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   const searchInputRef = useRef(null);
 
   const paddingTop = top > 0 ? top + 10 : 30;
+
+  useEffect(() => {
+    handleImages();
+  }, []);
+
+  const handleImages = async (params = { page: 1 }, append = true) => {
+    const response: IhandleImagesResponse = await ImagesService.getImages(
+      params
+    );
+
+    if (response.success) {
+      if (append) {
+        setImages([...images, ...response.data]);
+      } else {
+        setImages(response.data);
+      }
+    }
+  };
 
   return (
     <View style={[styles.container, { paddingTop }]}>
@@ -71,6 +92,12 @@ const HomeScreen = () => {
             activeCategory={activeCategory}
             handleChangeActive={setActiveCategory}
           />
+        </View>
+
+        <View>
+          {
+            images.length > 0 && <ImagesGrid images={images} />
+          }
         </View>
       </ScrollView>
     </View>
