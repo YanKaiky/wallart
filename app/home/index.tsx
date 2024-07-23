@@ -94,11 +94,7 @@ const HomeScreen = () => {
           />
         </View>
 
-        <View>
-          {
-            images.length > 0 && <ImagesGrid images={images} />
-          }
-        </View>
+        <View>{images.length > 0 && <ImagesGrid images={images} />}</View>
       </ScrollView>
     </View>
   );

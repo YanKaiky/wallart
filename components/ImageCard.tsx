@@ -1,5 +1,8 @@
+import { theme } from "@/constants/theme";
+import { getImageSize, wp } from "@/helpers/common";
+import { Image } from "expo-image";
 import { FC } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 
 export interface IImageCardProps {
   image: {
@@ -26,16 +29,45 @@ export interface IImageCardProps {
     user: string;
     userImageURL: string;
   };
+  columns: number;
+  index: number;
 }
 
-const ImageCard: FC<IImageCardProps> = ({ image }) => {
-  return <View>
-    <Text>ImageCard</Text>
-  </View>;
+const ImageCard: FC<IImageCardProps> = ({ image, columns, index }) => {
+  const getImageHeight = () => {
+    return { height: getImageSize(image.imageHeight, image.imageWidth) };
+  };
+
+  const isLastInRow = () => {
+    return (index + 1) % columns === 0;
+  };
+
+  return (
+    <Pressable style={[styles.imageWrapper, !isLastInRow() && styles.spacing]}>
+      <Image
+        style={[styles.image, getImageHeight()]}
+        transition={100}
+        source={{ uri: image?.webformatURL }}
+      />
+    </Pressable>
+  );
 };
 
 const styles = StyleSheet.create({
-  title: {},
+  image: {
+    height: 300,
+    width: "100%",
+  },
+  imageWrapper: {
+    backgroundColor: theme.colors.grayBG,
+    borderRadius: theme.radius.xl,
+    borderCurve: "continuous",
+    overflow: "hidden",
+    marginBottom: wp(2),
+  },
+  spacing: {
+    marginRight: wp(2),
+  },
 });
 
 export default ImageCard;
