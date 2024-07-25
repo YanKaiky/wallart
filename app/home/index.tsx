@@ -32,7 +32,7 @@ const HomeScreen = () => {
     handleImages();
   }, []);
 
-  const handleImages = async (params: object = { page: 1 }, append = false) => {
+  const handleImages = async (params: object = { page: 1 }, append = true) => {
     const response: IhandleImagesResponse = await ImagesService.getImages(
       params
     );
@@ -51,14 +51,35 @@ const HomeScreen = () => {
 
     if (src.length >= 3) {
       setImages([]);
-      await handleImages({ page: 1, q: src });
+      setActiveCategory(null);
+      await handleImages({ page: 1, q: src }, false);
     }
 
     if (!src) {
       setImages([]);
+      setActiveCategory(null);
       searchInputRef?.current?.clear();
-      await handleImages({ page: 1 });
+      await handleImages({ page: 1 }, false);
     }
+  };
+
+  const clearSearch = () => {
+    setSearch("");
+    searchInputRef?.current?.clear();
+  };
+
+  const handleChangeCategory = (ctgr: string | null) => {
+    setActiveCategory(ctgr);
+    clearSearch();
+    setImages([]);
+
+    const params: any = {
+      page: 1,
+    };
+
+    if (ctgr) params.category = ctgr;
+
+    handleImages(params, false);
   };
 
   const handleSearchDebounce = useCallback(debounce(handleSearch, 400), []);
@@ -110,7 +131,7 @@ const HomeScreen = () => {
         <View style={styles.categories}>
           <Categories
             activeCategory={activeCategory}
-            handleChangeActive={setActiveCategory}
+            handleChangeActive={handleChangeCategory}
           />
         </View>
 
