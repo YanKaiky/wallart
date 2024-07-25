@@ -4,7 +4,7 @@ import { theme } from "@/constants/theme";
 import { hp, wp } from "@/helpers/common";
 import ImagesService, { IhandleImagesResponse } from "@/services/images/images";
 import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Pressable,
   ScrollView,
@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { debounce } from "lodash";
 
 const HomeScreen = () => {
   const { top } = useSafeAreaInsets();
@@ -23,7 +24,7 @@ const HomeScreen = () => {
 
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const searchInputRef = useRef(null);
+  const searchInputRef: any = useRef(null);
 
   const paddingTop = top > 0 ? top + 10 : 30;
 
@@ -31,7 +32,7 @@ const HomeScreen = () => {
     handleImages();
   }, []);
 
-  const handleImages = async (params = { page: 1 }, append = true) => {
+  const handleImages = async (params: object = { page: 1 }, append = false) => {
     const response: IhandleImagesResponse = await ImagesService.getImages(
       params
     );
@@ -44,6 +45,23 @@ const HomeScreen = () => {
       }
     }
   };
+
+  const handleSearch = async (src: string) => {
+    setSearch(src);
+
+    if (src.length >= 3) {
+      setImages([]);
+      await handleImages({ page: 1, q: src });
+    }
+
+    if (!src) {
+      setImages([]);
+      searchInputRef?.current?.clear();
+      await handleImages({ page: 1 });
+    }
+  };
+
+  const handleSearchDebounce = useCallback(debounce(handleSearch, 400), []);
 
   return (
     <View style={[styles.container, { paddingTop }]}>
@@ -70,14 +88,16 @@ const HomeScreen = () => {
             />
           </View>
           <TextInput
-            value={search}
             placeholder="Search for photos..."
             ref={searchInputRef}
             style={styles.searchInput}
-            onChangeText={(value: string) => setSearch(value)}
+            onChangeText={handleSearchDebounce}
           />
           {search && (
-            <Pressable style={styles.closeIcon} onPress={() => setSearch("")}>
+            <Pressable
+              style={styles.closeIcon}
+              onPress={() => handleSearch("")}
+            >
               <Ionicons
                 name="close"
                 size={24}
