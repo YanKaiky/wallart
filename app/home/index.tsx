@@ -4,7 +4,13 @@ import { theme } from "@/constants/theme";
 import { hp, wp } from "@/helpers/common";
 import ImagesService, { IhandleImagesResponse } from "@/services/images/images";
 import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Pressable,
   ScrollView,
@@ -15,6 +21,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { debounce } from "lodash";
+import FiltersModal from "@/components/FiltersModal";
 
 const HomeScreen = () => {
   const { top } = useSafeAreaInsets();
@@ -24,7 +31,9 @@ const HomeScreen = () => {
 
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const searchInputRef: any = useRef(null);
+  const modalRef: any = useRef<MutableRefObject<any>>(null);
+
+  const searchInputRef: any = useRef<MutableRefObject<any>>(null);
 
   const paddingTop = top > 0 ? top + 10 : 30;
 
@@ -44,6 +53,14 @@ const HomeScreen = () => {
         setImages(response.data);
       }
     }
+  };
+
+  const openFiltersModal = () => {
+    modalRef?.current?.present();
+  };
+
+  const closeFiltersModal = () => {
+    modalRef?.current?.close();
   };
 
   const handleSearch = async (src: string) => {
@@ -90,7 +107,7 @@ const HomeScreen = () => {
         <Pressable>
           <Text style={styles.title}>Wallart</Text>
         </Pressable>
-        <Pressable>
+        <Pressable onPress={openFiltersModal}>
           <FontAwesome6
             name="bars-staggered"
             size={22}
@@ -137,6 +154,8 @@ const HomeScreen = () => {
 
         <View>{images.length > 0 && <ImagesGrid images={images} />}</View>
       </ScrollView>
+
+      <FiltersModal modalRef={modalRef} />
     </View>
   );
 };
