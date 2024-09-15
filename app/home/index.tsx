@@ -1,4 +1,3 @@
-import Categories from "@/components/Categories";
 import ImagesGrid from "@/components/ImagesGrid";
 import { theme } from "@/constants/theme";
 import { hp, wp } from "@/helpers/common";
@@ -22,6 +21,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { debounce } from "lodash";
 import FiltersModal from "@/components/FiltersModal";
+import Categories from "@/components/Categories";
 
 const HomeScreen = () => {
   const { top } = useSafeAreaInsets();
