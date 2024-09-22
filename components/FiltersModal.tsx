@@ -9,6 +9,9 @@ import Animated, {
 } from "react-native-reanimated";
 import { hp } from "@/helpers/common";
 import { theme } from "@/constants/theme";
+import { data } from "@/constants/data";
+import { CommomFilterRow, SectionView } from "./FiltersView";
+import { capitalize } from "lodash";
 
 interface IFiltersModalProps {
   modalRef: MutableRefObject<any>;
@@ -33,11 +36,31 @@ const FiltersModal: FC<IFiltersModalProps> = ({ modalRef }) => {
       <BottomSheetView style={styles.contentContainer}>
         <View style={styles.content}>
           <Text style={styles.filterText}>Filters</Text>
-          <Text style={styles.filterText}>Sections here</Text>
+          {Object.keys(sections).map((name, i) => {
+            const sectionView = sections[name];
+            const sectionData = data.filters[name];
+            const title = capitalize(name);
+
+            return (
+              <View key={name}>
+                <SectionView
+                  title={title}
+                  content={sectionView({ data: sectionData })}
+                />
+              </View>
+            );
+          })}
         </View>
       </BottomSheetView>
     </BottomSheetModal>
   );
+};
+
+const sections: any = {
+  order: (props: any) => <CommomFilterRow {...props} />,
+  orientation: (props: any) => <CommomFilterRow {...props} />,
+  type: (props: any) => <CommomFilterRow {...props} />,
+  colors: (props: any) => <CommomFilterRow {...props} />,
 };
 
 const CustomBackdrop: FC<ICustombackdropModalProps> = ({
@@ -78,8 +101,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
   },
   content: {
-    // flex: 1,
-    // gap: 15,
     width: "100%",
     paddingVertical: 10,
     paddingHorizontal: 20,

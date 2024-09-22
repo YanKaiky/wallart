@@ -1,4 +1,4 @@
-const categories = [
+const categories: any = [
   "backgrounds",
   "fashion",
   "nature",
@@ -21,7 +21,7 @@ const categories = [
   "music",
 ];
 
-const filters = {
+const filters: any = {
   order: ["popular", "latest"],
   orientation: ["horizontal", "vertical"],
   type: ["photo", "illustration", "vector"],
