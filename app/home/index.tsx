@@ -11,6 +11,7 @@ import {
   useState,
 } from "react";
 import {
+  ActivityIndicator,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -87,7 +88,22 @@ const HomeScreen = () => {
   };
 
   const resetFilters = () => {
-    setFilters(null);
+    if (filters) {
+      setPage(1);
+      setImages([]);
+      setFilters(null);
+
+      const params: any = {
+        page: 1,
+      };
+
+      if (activeCategory) params.category = activeCategory;
+
+      if (search) params.q = search;
+
+      handleImages(params, false);
+    }
+
     closeFiltersModal();
   };
 
@@ -97,20 +113,42 @@ const HomeScreen = () => {
     if (src.length >= 3) {
       setImages([]);
       setActiveCategory(null);
-      await handleImages({ page: 1, q: src }, false);
+      await handleImages({ page: 1, q: src, ...filters }, false);
     }
 
     if (!src) {
       setImages([]);
       setActiveCategory(null);
       searchInputRef?.current?.clear();
-      await handleImages({ page: 1 }, false);
+      await handleImages({ page: 1, ...filters }, false);
     }
   };
 
   const clearSearch = () => {
     setSearch("");
     searchInputRef?.current?.clear();
+  };
+
+  const clearThisFilter = (filterName: string) => {
+    const curretnFilters: IFiltersProps = { ...filters };
+
+    delete curretnFilters[filterName];
+
+    setFilters({ ...curretnFilters });
+
+    setPage(1);
+    setImages([]);
+
+    const params: any = {
+      page: 1,
+      ...curretnFilters,
+    };
+
+    if (activeCategory) params.category = activeCategory;
+
+    if (search) params.q = search;
+
+    handleImages(params, false);
   };
 
   const handleChangeCategory = (ctgr: string | null) => {
@@ -120,6 +158,7 @@ const HomeScreen = () => {
 
     const params: any = {
       page,
+      ...filters,
     };
 
     if (ctgr) params.category = ctgr;
@@ -175,14 +214,60 @@ const HomeScreen = () => {
           )}
         </View>
 
-        <View style={styles.categories}>
+        <View>
           <Categories
             activeCategory={activeCategory}
             handleChangeActive={handleChangeCategory}
           />
         </View>
 
+        {filters && (
+          <View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.filters}
+            >
+              {Object.keys(filters).map((key: any) => {
+                return (
+                  <View key={key} style={styles.filterItem}>
+                    {key === "colors" ? (
+                      <View
+                        style={{
+                          height: 20,
+                          width: 30,
+                          borderRadius: 7,
+                          backgroundColor: filters[key],
+                        }}
+                      />
+                    ) : (
+                      <Text style={styles.filterItemText}>{filters[key]}</Text>
+                    )}
+
+                    <Pressable
+                      style={styles.filterCloseIcon}
+                      onPress={() => clearThisFilter(key)}
+                    >
+                      <Ionicons
+                        name="close"
+                        size={14}
+                        color={theme.colors.neutral(0.9)}
+                      />
+                    </Pressable>
+                  </View>
+                );
+              })}
+            </ScrollView>
+          </View>
+        )}
+
         <View>{images.length > 0 && <ImagesGrid images={images} />}</View>
+
+        <View
+          style={{ marginBottom: 70, marginTop: images.length > 0 ? 10 : 70 }}
+        >
+          <ActivityIndicator size="large" />
+        </View>
       </ScrollView>
 
       <FiltersModal
@@ -239,7 +324,27 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: theme.radius.sm,
   },
-  categories: {},
+  filters: {
+    paddingHorizontal: wp(4),
+    gap: 10,
+  },
+  filterItem: {
+    backgroundColor: theme.colors.grayBG,
+    padding: 8,
+    alignItems: "center",
+    flexDirection: "row",
+    borderRadius: theme.radius.xs,
+    gap: 10,
+    paddingHorizontal: 10,
+  },
+  filterItemText: {
+    fontSize: hp(1.9),
+  },
+  filterCloseIcon: {
+    backgroundColor: theme.colors.neutral(0.2),
+    padding: 4,
+    borderRadius: 7,
+  },
 });
 
 export default HomeScreen;

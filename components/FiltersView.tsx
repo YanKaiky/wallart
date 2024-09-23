@@ -17,10 +17,7 @@ interface IFilterProps {
 }
 
 export interface IFiltersProps {
-  colors?: string | null;
-  order?: string | null;
-  orientation?: string | null;
-  type?: string | null;
+  [key: "colors" | "order" | "orientation" | "type" | string]: string;
 }
 
 export const SectionView: FC<ISectionViewProps> = ({ title, content }) => {

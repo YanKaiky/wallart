@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { BlurView } from "expo-blur";
 import Animated, {
   Extrapolation,
+  FadeInDown,
   interpolate,
   useAnimatedStyle,
 } from "react-native-reanimated";
@@ -59,7 +60,12 @@ const FiltersModal: FC<IFiltersModalProps> = ({
             const title = capitalize(name);
 
             return (
-              <View key={name}>
+              <Animated.View
+                entering={FadeInDown.delay(i * 100 + 100)
+                  .springify()
+                  .damping(11)}
+                key={name}
+              >
                 <SectionView
                   title={title}
                   content={sectionView({
@@ -69,11 +75,14 @@ const FiltersModal: FC<IFiltersModalProps> = ({
                     filterName: name,
                   })}
                 />
-              </View>
+              </Animated.View>
             );
           })}
 
-          <View style={styles.buttons}>
+          <Animated.View
+            entering={FadeInDown.delay(500).springify().damping(11)}
+            style={styles.buttons}
+          >
             <Pressable style={styles.resetButton} onPress={onReset}>
               <Text
                 style={[
@@ -90,7 +99,7 @@ const FiltersModal: FC<IFiltersModalProps> = ({
                 Apply
               </Text>
             </Pressable>
-          </View>
+          </Animated.View>
         </View>
       </BottomSheetView>
     </BottomSheetModal>
