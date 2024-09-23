@@ -22,11 +22,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { debounce } from "lodash";
 import FiltersModal from "@/components/FiltersModal";
 import Categories from "@/components/Categories";
+import { IFiltersProps } from "@/components/FiltersView";
 
 const HomeScreen = () => {
   const { top } = useSafeAreaInsets();
 
+  const [page, setPage] = useState<number>(1);
   const [search, setSearch] = useState<string>("");
+  const [filters, setFilters] = useState<IFiltersProps | null>(null);
   const [images, setImages] = useState<object[]>([]);
 
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -41,7 +44,7 @@ const HomeScreen = () => {
     handleImages();
   }, []);
 
-  const handleImages = async (params: object = { page: 1 }, append = true) => {
+  const handleImages = async (params: object = { page }, append = true) => {
     const response: IhandleImagesResponse = await ImagesService.getImages(
       params
     );
@@ -61,6 +64,31 @@ const HomeScreen = () => {
 
   const closeFiltersModal = () => {
     modalRef?.current?.close();
+  };
+
+  const applyFilters = () => {
+    if (filters) {
+      setPage(1);
+      setImages([]);
+
+      const params: any = {
+        page: 1,
+        ...filters,
+      };
+
+      if (activeCategory) params.category = activeCategory;
+
+      if (search) params.q = search;
+
+      handleImages(params, false);
+    }
+
+    closeFiltersModal();
+  };
+
+  const resetFilters = () => {
+    setFilters(null);
+    closeFiltersModal();
   };
 
   const handleSearch = async (src: string) => {
@@ -91,7 +119,7 @@ const HomeScreen = () => {
     setImages([]);
 
     const params: any = {
-      page: 1,
+      page,
     };
 
     if (ctgr) params.category = ctgr;
@@ -100,6 +128,8 @@ const HomeScreen = () => {
   };
 
   const handleSearchDebounce = useCallback(debounce(handleSearch, 400), []);
+
+  console.log("filters: ", filters);
 
   return (
     <View style={[styles.container, { paddingTop }]}>
@@ -155,7 +185,14 @@ const HomeScreen = () => {
         <View>{images.length > 0 && <ImagesGrid images={images} />}</View>
       </ScrollView>
 
-      <FiltersModal modalRef={modalRef} />
+      <FiltersModal
+        modalRef={modalRef}
+        filters={filters}
+        setFilters={setFilters}
+        onClose={closeFiltersModal}
+        onApply={applyFilters}
+        onReset={resetFilters}
+      />
     </View>
   );
 };
