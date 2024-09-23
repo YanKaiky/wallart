@@ -3,9 +3,11 @@ import { FC } from "react";
 import { StyleSheet, View } from "react-native";
 import ImageCard from "./ImageCard";
 import { getColumnsCount, wp } from "@/helpers/common";
+import { Router } from "expo-router";
 
 interface IImagesGridProps {
   images: object[];
+  router: Router;
 }
 
 interface IRenderItem {
@@ -13,7 +15,7 @@ interface IRenderItem {
   index: number;
 }
 
-const ImagesGrid: FC<IImagesGridProps> = ({ images }) => {
+const ImagesGrid: FC<IImagesGridProps> = ({ images, router }) => {
   const columns = getColumnsCount();
 
   return (
@@ -23,7 +25,7 @@ const ImagesGrid: FC<IImagesGridProps> = ({ images }) => {
         numColumns={columns}
         contentContainerStyle={styles.listContainer}
         renderItem={({ item, index }: IRenderItem) => (
-          <ImageCard image={item} columns={columns} index={index} />
+          <ImageCard router={router} image={item} columns={columns} index={index} />
         )}
         estimatedItemSize={200}
       />

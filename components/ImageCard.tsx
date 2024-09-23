@@ -1,10 +1,12 @@
 import { theme } from "@/constants/theme";
 import { getImageSize, wp } from "@/helpers/common";
 import { Image } from "expo-image";
+import { Router, router } from "expo-router";
 import { FC } from "react";
 import { Pressable, StyleSheet } from "react-native";
 
 export interface IImageCardProps {
+  router: Router;
   image: {
     id: number;
     pageURL: string;
@@ -43,7 +45,12 @@ const ImageCard: FC<IImageCardProps> = ({ image, columns, index }) => {
   };
 
   return (
-    <Pressable style={[styles.imageWrapper, !isLastInRow() && styles.spacing]}>
+    <Pressable
+      onPress={() =>
+        router.push({ pathname: "/home/image", params: { ...image } })
+      }
+      style={[styles.imageWrapper, !isLastInRow() && styles.spacing]}
+    >
       <Image
         style={[styles.image, getImageHeight()]}
         transition={100}

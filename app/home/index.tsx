@@ -24,6 +24,7 @@ import { debounce } from "lodash";
 import FiltersModal from "@/components/FiltersModal";
 import Categories from "@/components/Categories";
 import { IFiltersProps } from "@/components/FiltersView";
+import { Router, useRouter } from "expo-router";
 
 const HomeScreen = () => {
   const { top } = useSafeAreaInsets();
@@ -33,6 +34,8 @@ const HomeScreen = () => {
   const [filters, setFilters] = useState<IFiltersProps | null>(null);
   const [images, setImages] = useState<object[]>([]);
   const [isEndReached, setIsEndReached] = useState<boolean>(false);
+
+  const router: Router = useRouter();
 
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
@@ -301,7 +304,9 @@ const HomeScreen = () => {
           </View>
         )}
 
-        <View>{images.length > 0 && <ImagesGrid images={images} />}</View>
+        <View>
+          {images.length > 0 && <ImagesGrid images={images} router={router} />}
+        </View>
 
         <View
           style={{ marginBottom: 70, marginTop: images.length > 0 ? 10 : 70 }}
